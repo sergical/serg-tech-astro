@@ -18,6 +18,12 @@ const theme = Astro.cookies.get('theme')?.value || 'dark';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script
+      id="counterscale-script"
+      data-site-id="serg_tech"
+      src="https://counterscale.s-a62.workers.dev/tracker.js"
+      defer
+    ></script>
   </head>
   <body>
     <slot />
