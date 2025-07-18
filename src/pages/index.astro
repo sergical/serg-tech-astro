@@ -1,17 +1,21 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import HobbyBlock from '../components/HobbyBlock.tsx';
+import Layout from '../layouts/Layout.astro';
 
 const theme = Astro.cookies.get('theme')?.value || 'dark';
 const textColor = theme === 'dark' ? 'text-primary' : 'text-primary';
+
+// Hobbies list
+const hobbies = ['Tennis', 'Snowboarding', 'Lego', 'Golf'];
 ---
 
 <Layout title="Sergiy Dybskiy, Builder">
   <div class="!visible transition-opacity duration-150 bg-background text-foreground !opacity-100" id="v0-container" style="visibility:hidden;opacity:0">
     <div class="min-h-screen font-mono p-4 flex items-center justify-center transition-colors duration-0" style="font-size: 14px;">
       <main class="max-w-[700px] w-full">
-        <Header name="sergiy dybskiy" location="toronto, canada" />
+        <Header location="toronto, canada" />
 
         <section class="mb-8" style="opacity: 1; will-change: opacity;">
           <div class="flex items-center mb-2">
@@ -82,18 +86,13 @@ const textColor = theme === 'dark' ? 'text-primary' : 'text-primary';
         <section class="mb-8" style="opacity: 1; will-change: opacity;">
           <h2 class="font-semibold mb-2">hobbies</h2>
           <div class="grid grid-cols-2 gap-3 group hover-group">
-            <a href="#" class="border p-1 border-muted hover:border-primary transition-all duration-300 ease-in-out opacity-100 hover-group-hover:opacity-50 hover:!opacity-100 hover:!border-opacity-100">
-              <span class="flex items-center justify-between {textColor}">Tennis</span>
-            </a>
-            <a href="#" class="border p-1 border-muted hover:border-primary transition-all duration-300 ease-in-out opacity-100 hover-group-hover:opacity-50 hover:!opacity-100 hover:!border-opacity-100">
-              <span class="flex items-center justify-between {textColor}">Snowboarding</span>
-            </a>
-            <a href="#" class="border p-1 border-muted hover:border-primary transition-all duration-300 ease-in-out opacity-100 hover-group-hover:opacity-50 hover:!opacity-100 hover:!border-opacity-100">
-              <span class="flex items-center justify-between {textColor}">Lego</span>
-            </a>
-            <a href="#" class="border p-1 border-muted hover:border-primary transition-all duration-300 ease-in-out opacity-100 hover-group-hover:opacity-50 hover:!opacity-100 hover:!border-opacity-100">
-              <span class="flex items-center justify-between {textColor}">Travel</span>
-            </a>
+            {hobbies.map((hobby) => (
+              <HobbyBlock 
+                name={hobby}
+                textColor={textColor}
+                client:load
+              />
+            ))}
           </div>
         </section>
 

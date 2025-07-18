@@ -1,32 +1,37 @@
 <script>
   import { onMount } from 'svelte';
 
+  // State variables
   let displayText = '';
-  let currentIndex = 0;
-  const texts = ['sergiy dybskiy', 'serge'];
+  let currentTextIndex = 0;
   let isTyping = true;
-  let isClearing = false;
   let shouldBlink = false;
 
+  // Configuration
+  const TEXTS = ['sergiy dybskiy', 'serge'];
+  const TYPING_SPEED = 100;
+  const CLEARING_SPEED = 50;
+  const PAUSE_AFTER_TYPING = 2000;
+  const PAUSE_BEFORE_TYPING = 500;
+
   onMount(() => {
-    let timeout;
+    let timeoutId;
     
     const typeText = () => {
-      const currentText = texts[currentIndex];
+      const currentText = TEXTS[currentTextIndex];
       
       if (isTyping) {
         if (displayText.length < currentText.length) {
           displayText = currentText.slice(0, displayText.length + 1);
-          timeout = setTimeout(typeText, 100); // Typing speed
+          timeoutId = setTimeout(typeText, TYPING_SPEED);
         } else {
-          // Finished typing, wait then start clearing
+          // Finished typing, pause then start clearing
           shouldBlink = true;
-          timeout = setTimeout(() => {
+          timeoutId = setTimeout(() => {
             shouldBlink = false;
             isTyping = false;
-            isClearing = true;
             clearText();
-          }, 2000); // Pause before clearing
+          }, PAUSE_AFTER_TYPING);
         }
       }
     };
@@ -34,17 +39,16 @@
     const clearText = () => {
       if (displayText.length > 0) {
         displayText = displayText.slice(0, -1);
-        timeout = setTimeout(clearText, 50); // Clearing speed
+        timeoutId = setTimeout(clearText, CLEARING_SPEED);
       } else {
         // Finished clearing, move to next text
-        isClearing = false;
         shouldBlink = true;
-        currentIndex = (currentIndex + 1) % texts.length;
-        timeout = setTimeout(() => {
+        currentTextIndex = (currentTextIndex + 1) % TEXTS.length;
+        timeoutId = setTimeout(() => {
           shouldBlink = false;
           isTyping = true;
           typeText();
-        }, 500); // Pause before next text
+        }, PAUSE_BEFORE_TYPING);
       }
     };
 
@@ -53,7 +57,7 @@
 
     // Cleanup function
     return () => {
-      if (timeout) clearTimeout(timeout);
+      if (timeoutId) clearTimeout(timeoutId);
     };
   });
 </script>

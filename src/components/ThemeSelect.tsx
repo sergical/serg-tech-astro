@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import SentryIcon from "@/icons/SentryIcon";
 import { MoonIcon, SunIcon } from "lucide-react";
@@ -42,11 +42,6 @@ export default function ThemeSelect({
 
   const [theme, setTheme] = useState<string>(initialTheme);
 
-  useEffect(() => {
-    // Save to localStorage for persistence
-    localStorage.setItem("theme", initialTheme);
-  }, [initialTheme]);
-
   const handleThemeChange = async (newTheme: string) => {
     try {
       // Update server-side cookie
@@ -64,9 +59,6 @@ export default function ThemeSelect({
 
         // Update document class
         document.documentElement.className = newTheme;
-
-        // Save to localStorage for persistence
-        localStorage.setItem("theme", newTheme);
       }
     } catch (error) {
       console.error("Failed to update theme:", error);

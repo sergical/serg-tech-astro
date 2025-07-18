@@ -3,15 +3,30 @@ import ThemeSelect from './ThemeSelect.tsx';
 
 // Get the current theme from cookies
 const theme = Astro.cookies.get('theme')?.value || 'light';
+
+// Social links configuration
+const socialLinks = [
+  { href: 'https://x.com/sergedottech', label: '𝕏', text: '𝕏' },
+  { href: 'https://github.com/sergical', label: 'GitHub', text: 'GitHub' },
+  { href: 'https://www.linkedin.com/in/sergical/', label: 'LinkedIn', text: 'LinkedIn' },
+  { href: 'https://portfolio-template.v0.build/', label: 'Inspired by', text: 'Inspired by' }
+];
 ---
 
 <footer class="flex justify-between items-center">
-  <div class="flex space-x-4">
-    <a href="https://x.com/sergedottech" class="text-foreground hover:text-muted transition-colors" target="_blank" aria-label="𝕏">𝕏</a>
-    <a href="https://github.com/sergical" class="text-foreground hover:text-muted transition-colors" target="_blank" aria-label="GitHub">GitHub</a>
-    <a href="https://www.linkedin.com/in/sergical/" class="text-foreground hover:text-muted transition-colors" target="_blank" aria-label="LinkedIn">LinkedIn</a>
-    <a href="https://portfolio-template.v0.build/" class="text-foreground hover:text-muted transition-colors" target="_blank" aria-label="Instagram">Inspired by</a>
-  </div>
+  <nav class="flex space-x-4" aria-label="Social media links">
+    {socialLinks.map(link => (
+      <a 
+        href={link.href} 
+        class="text-foreground hover:text-muted transition-colors" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        aria-label={link.label}
+      >
+        {link.text}
+      </a>
+    ))}
+  </nav>
   <div class="flex space-x-4">
     <ThemeSelect client:load initialTheme={theme} />
   </div>
