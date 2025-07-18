@@ -8,11 +8,15 @@ import react from "@astrojs/react";
 
 import tailwindcss from "@tailwindcss/vite";
 
+import icon from "astro-icon";
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  integrations: [svelte(), react()],
-  adapter: cloudflare(),
+  integrations: [svelte(), react(), icon()],
+  adapter: cloudflare({
+    imageService: "compile",
+  }),
 
   vite: {
     plugins: [tailwindcss()],

@@ -1,5 +1,8 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
+import ThemeSelect from './ThemeSelect.tsx';
+
+// Get the current theme from cookies
+const theme = Astro.cookies.get('theme')?.value || 'light';
 ---
 
 <footer class="flex justify-between items-center">
@@ -9,5 +12,7 @@ import ThemeToggle from './ThemeToggle.astro';
     <a href="https://www.linkedin.com/in/sergical/" class="text-foreground hover:text-muted transition-colors" target="_blank" aria-label="LinkedIn">LinkedIn</a>
     <a href="https://portfolio-template.v0.build/" class="text-foreground hover:text-muted transition-colors" target="_blank" aria-label="Instagram">Inspired by</a>
   </div>
-  <ThemeToggle />
+  <div class="flex space-x-4">
+    <ThemeSelect client:load initialTheme={theme} />
+  </div>
 </footer>

@@ -6,7 +6,7 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const theme = Astro.cookies.get('theme')?.value || 'dark';
+const theme = Astro.cookies.get('theme')?.value || 'light';
 
 import "../styles/global.css";
 
@@ -46,6 +46,13 @@ import "../styles/global.css";
     --foreground: #ffffff;
     --primary: #e5e5e5;
     --muted: #666666;
+  }
+
+  :root[class~="sentry"] {
+    --background: #2b1b3d;
+    --foreground: #f7f5fb;
+    --primary: #ff6154;
+    --muted: #9b89a8;
   }
 
   html {
