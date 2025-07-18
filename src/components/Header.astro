@@ -1,4 +1,6 @@
 ---
+import TypewriterName from './TypewriterName.svelte';
+
 interface Props {
   name: string;
   location: string;
@@ -9,7 +11,7 @@ const { name, location } = Astro.props;
 
 <header class="mb-8">
   <div class="flex items-center mb-1">
-    <h1 class="font-bold flex items-center">{name}<span class="inline-block ml-1">█</span></h1>
+    <h1><TypewriterName client:load /></h1>
   </div>
   <p class="mb-3 text-[#666]">{location}</p>
 </header>
