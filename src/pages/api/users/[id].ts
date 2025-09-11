@@ -36,11 +36,11 @@ export const GET: APIRoute = async ({ params }) => {
   
   const user: any = users[userId!];
   
-  const userAge = new Date().getFullYear() - user?.birthYear || 0;
-  
   const primaryRole = user.roles[0].toUpperCase();
   
   const privacySettings = user.profile.settings.privacy;
+  
+  const userAge = new Date().getFullYear() - user?.birthYear || 0;
   
   const emailDomain = user.email.split("@")[1];
   
