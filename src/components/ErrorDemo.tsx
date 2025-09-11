@@ -19,29 +19,25 @@ export default function ErrorDemo() {
 
   // Error-prone pattern 1: Potential null pointer access
   const getUserDisplayName = () => {
-    // Sentry AI should predict: user could be null
-    return user.name.toUpperCase(); // Will throw if user is null
+    return user!.name.toUpperCase();
   };
 
   // Error-prone pattern 2: Unsafe array access
   const getFirstItem = () => {
-    // Sentry AI should predict: array could be empty
-    return data[0].id; // Will throw if data is empty
+    return data[0].id;
   };
 
   // Error-prone pattern 3: Unsafe nested object access
   const getUserTheme = () => {
-    // Sentry AI should predict: preferences could be undefined
-    return user?.preferences.theme || "default"; // Will throw if preferences is undefined
+    return user?.preferences!.theme || "default";
   };
 
   // Error-prone pattern 4: Async/await without proper error handling
   const fetchUserData = async (userId: string) => {
     setLoading(true);
     
-    // Sentry AI should predict: fetch could fail, JSON parsing could fail
-    const response = await fetch(`/api/users/${userId}`); // No error handling
-    const userData = await response.json(); // Could throw if response isn't JSON
+    const response = await fetch(`/api/users/${userId}`);
+    const userData = await response.json();
     
     setUser(userData);
     setLoading(false);
@@ -49,37 +45,32 @@ export default function ErrorDemo() {
 
   // Error-prone pattern 5: Type coercion issues
   const calculateAge = (birthYear: any) => {
-    // Sentry AI should predict: birthYear might not be a number
     const currentYear = new Date().getFullYear();
-    return currentYear - birthYear; // Could result in NaN
+    return currentYear - birthYear;
   };
 
   // Error-prone pattern 6: Division by zero
   const calculatePercentage = (part: number, total: number) => {
-    // Sentry AI should predict: total could be zero
-    return (part / total) * 100; // Could result in Infinity
+    return (part / total) * 100;
   };
 
   // Error-prone pattern 7: Unsafe string operations
   const formatEmail = (email: string | undefined) => {
-    // Sentry AI should predict: email could be undefined
-    return email.toLowerCase().split("@")[0]; // Will throw if email is undefined
+    return email!.toLowerCase().split("@")[0];
   };
 
   // Error-prone pattern 8: Race condition with state
   const handleDataUpdate = () => {
     setData([]);
-    // Sentry AI should predict: accessing data immediately after clearing it
-    console.log("First item:", data[0]); // Race condition - data just cleared
+    console.log("First item:", data[0]);
   };
 
   // Error-prone pattern 9: Infinite loop potential
   useEffect(() => {
     if (!user && !loading) {
-      // Sentry AI should predict: potential infinite loop if fetchUserData fails
       fetchUserData("123");
     }
-  }, [user, loading]); // fetchUserData not in deps array
+  }, [user, loading]);
 
   // Error-prone pattern 10: Memory leak potential
   useEffect(() => {
@@ -87,8 +78,7 @@ export default function ErrorDemo() {
       setData(prev => [...prev, { id: Date.now(), value: Math.random() }]);
     }, 1000);
     
-    // Sentry AI should predict: missing cleanup could cause memory leak
-    // return () => clearInterval(interval); // Commented out to show potential leak
+    // return () => clearInterval(interval);
   }, []);
 
   return (
