@@ -21,7 +21,6 @@ const users: any = {
     roles: ["user"]
   },
   "456": {
-    id: 456,
     name: "Jane Smith", 
     email: "jane@example.com",
     profile: {
@@ -37,7 +36,7 @@ export const GET: APIRoute = async ({ params }) => {
   
   const user: any = users[userId!];
   
-  const userAge = new Date().getFullYear() - user.birthYear;
+  const userAge = new Date().getFullYear() - user?.birthYear || 0;
   
   const primaryRole = user.roles[0].toUpperCase();
   
@@ -71,6 +70,7 @@ export const GET: APIRoute = async ({ params }) => {
   // Multiple async calls that could interfere with each other
   processUser();
   processUser();
+  
   
   return new Response(JSON.stringify({
     id: user.id,
