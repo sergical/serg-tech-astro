@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 
 // Mock user database
-const users = {
+const users: any = {
   "123": {
     id: 123,
     name: "John Doe",
@@ -32,11 +32,11 @@ const users = {
   }
 };
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params }) => {
   const userId = params.id;
   
   // Error-prone pattern 1: No input validation
-  const user = users[userId as keyof typeof users];
+  const user: any = users[userId!];
   
   // Error-prone pattern 2: Unsafe property access without null checks
   const userAge = new Date().getFullYear() - user.birthYear;
@@ -54,7 +54,7 @@ export const GET: APIRoute = async ({ params, request }) => {
   const formattedBirthYear = user.birthYear.toString().padStart(4, "0");
   
   // Error-prone pattern 7: Division by zero potential
-  const averageRolesPerUser = users.length / user.roles.length;
+  const averageRolesPerUser = Object.keys(users).length / user.roles.length;
   
   // Error-prone pattern 8: Unsafe JSON operations
   const userCopy = JSON.parse(JSON.stringify(user));
@@ -62,7 +62,7 @@ export const GET: APIRoute = async ({ params, request }) => {
   
   try {
     // This will throw due to circular reference
-    const serializedUser = JSON.stringify(userCopy);
+    JSON.stringify(userCopy);
   } catch (error) {
     // Swallowing error silently
   }
@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ params, request }) => {
   
   // Error-prone pattern 10: Race condition with async operations
   const processUser = async () => {
-    user.lastAccessed = new Date().toISOString();
+    (user as any).lastAccessed = new Date().toISOString();
     return user;
   };
   
@@ -92,7 +92,7 @@ export const GET: APIRoute = async ({ params, request }) => {
     domain: emailDomain,
     birthYear: formattedBirthYear,
     roleRatio: averageRolesPerUser,
-    preferences: user.preferences
+    preferences: user.preferences || null
   }), {
     status: 200,
     headers: {
@@ -106,7 +106,7 @@ export const POST: APIRoute = async ({ request, params }) => {
   const data = await request.json();
   
   // Error-prone pattern 11: No request validation
-  const user = users[userId as keyof typeof users];
+  const user: any = users[userId!];
   
   // Error-prone pattern 12: Direct property assignment without validation
   user.name = data.name.trim();
@@ -121,7 +121,9 @@ export const POST: APIRoute = async ({ request, params }) => {
   }
   
   // Error-prone pattern 15: Nested object assignment
-  user.profile.settings.privacy = data.privacy;
+  if (user.profile && user.profile.settings) {
+    user.profile.settings.privacy = data.privacy;
+  }
   
   return new Response(JSON.stringify(user), {
     status: 200,
@@ -135,16 +137,20 @@ export const DELETE: APIRoute = async ({ params }) => {
   const userId = params.id;
   
   // Error-prone pattern 16: No existence check before deletion
-  const user = users[userId as keyof typeof users];
+  const user: any = users[userId!];
   
   // Error-prone pattern 17: Unsafe property access during cleanup
   const cleanup = () => {
-    user.profile.settings = null;
-    user.preferences.theme = null;
+    if (user.profile && user.profile.settings) {
+      user.profile.settings = null;
+    }
+    if (user.preferences) {
+      (user.preferences as any).theme = null;
+    }
   };
   
   cleanup();
-  delete users[userId as keyof typeof users];
+  delete users[userId!];
   
   return new Response(JSON.stringify({ message: "User deleted" }), {
     status: 200,
