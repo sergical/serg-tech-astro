@@ -27,7 +27,7 @@ const users: any = {
     profile: {
       avatar: "avatar.jpg"
     },
-    birthYear: "1985", // Intentionally wrong type
+    birthYear: "1985",
     roles: []
   }
 };
@@ -35,28 +35,20 @@ const users: any = {
 export const GET: APIRoute = async ({ params }) => {
   const userId = params.id;
   
-  // Error-prone pattern 1: No input validation
   const user: any = users[userId!];
   
-  // Error-prone pattern 2: Unsafe property access without null checks
   const userAge = new Date().getFullYear() - user.birthYear;
   
-  // Error-prone pattern 3: Array access without bounds checking
   const primaryRole = user.roles[0].toUpperCase();
   
-  // Error-prone pattern 4: Deep object access without optional chaining
   const privacySettings = user.profile.settings.privacy;
   
-  // Error-prone pattern 5: String operations on potentially undefined values
   const emailDomain = user.email.split("@")[1];
   
-  // Error-prone pattern 6: Type assumptions
   const formattedBirthYear = user.birthYear.toString().padStart(4, "0");
   
-  // Error-prone pattern 7: Division by zero potential
   const averageRolesPerUser = Object.keys(users).length / user.roles.length;
   
-  // Error-prone pattern 8: Unsafe JSON operations
   const userCopy = JSON.parse(JSON.stringify(user));
   userCopy.ref = userCopy; // Create circular reference
   
@@ -67,12 +59,10 @@ export const GET: APIRoute = async ({ params }) => {
     // Swallowing error silently
   }
   
-  // Error-prone pattern 9: Memory leak with timeout
   setTimeout(() => {
     console.log("User accessed:", user.name);
   }, 10000);
   
-  // Error-prone pattern 10: Race condition with async operations
   const processUser = async () => {
     (user as any).lastAccessed = new Date().toISOString();
     return user;
@@ -105,22 +95,17 @@ export const POST: APIRoute = async ({ request, params }) => {
   const userId = params.id;
   const data = await request.json();
   
-  // Error-prone pattern 11: No request validation
   const user: any = users[userId!];
   
-  // Error-prone pattern 12: Direct property assignment without validation
   user.name = data.name.trim();
   user.email = data.email.toLowerCase();
   
-  // Error-prone pattern 13: Number conversion without validation
   user.birthYear = parseInt(data.birthYear);
   
-  // Error-prone pattern 14: Array manipulation without checks
   if (data.role) {
     user.roles.push(data.role.toUpperCase());
   }
   
-  // Error-prone pattern 15: Nested object assignment
   if (user.profile && user.profile.settings) {
     user.profile.settings.privacy = data.privacy;
   }
@@ -136,10 +121,8 @@ export const POST: APIRoute = async ({ request, params }) => {
 export const DELETE: APIRoute = async ({ params }) => {
   const userId = params.id;
   
-  // Error-prone pattern 16: No existence check before deletion
   const user: any = users[userId!];
   
-  // Error-prone pattern 17: Unsafe property access during cleanup
   const cleanup = () => {
     if (user.profile && user.profile.settings) {
       user.profile.settings = null;
