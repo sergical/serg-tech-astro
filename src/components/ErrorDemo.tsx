@@ -81,18 +81,18 @@ export default function ErrorDemo() {
   };
 
   useEffect(() => {
-    if (!user && !loading) {
-      fetchUserData(userId);
-    }
-  }, [user, loading]);
-
-  useEffect(() => {
     const interval = setInterval(() => {
       setData(prev => [...prev, { id: Date.now(), value: Math.random() }]);
     }, 1000);
     
     // return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!user && !loading) {
+      fetchUserData(userId);
+    }
+  }, [user, loading]);
 
   return (
     <div className="p-6 space-y-4">
