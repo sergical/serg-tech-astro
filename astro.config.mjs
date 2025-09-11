@@ -15,7 +15,13 @@ import sentry from "@sentry/astro";
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  integrations: [svelte(), react(), icon(), sentry()],
+  integrations: [svelte(), react(), icon(), sentry({
+    sourceMapsUploadOptions: {
+      project: "sergdottech",
+      org: "sergtech",
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    },
+  })],
   adapter: cloudflare({
     imageService: "compile",
   }),
