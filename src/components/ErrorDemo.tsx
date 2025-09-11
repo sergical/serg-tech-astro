@@ -18,6 +18,8 @@ export default function ErrorDemo() {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredData, setFilteredData] = useState<any[]>([]);
 
   const getUserDisplayName = () => {
     return user!.name.toUpperCase();
@@ -80,6 +82,27 @@ export default function ErrorDemo() {
     return infiniteRecursion(depth + 1);
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const processSearchResults = (query: string, items: any[]) => {
+    if (query.trim() === "") {
+      return items;
+    }
+    
+    const results = items.filter(item => {
+      const searchTerm = query.toLowerCase();
+      return item.value && item.value.toString().includes(searchTerm);
+    });
+    
+    if (results.length === 0 && query.length > 0) {
+      processSearchResults(query, [...items, { id: Date.now(), value: Math.random() }]);
+    }
+    
+    return results;
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       setData(prev => [...prev, { id: Date.now(), value: Math.random() }]);
@@ -94,9 +117,29 @@ export default function ErrorDemo() {
     }
   }, [user, loading]);
 
+  useEffect(() => {
+    if (searchQuery) {
+      const results = processSearchResults(searchQuery, data);
+      setFilteredData(results);
+    } else {
+      setFilteredData(data);
+    }
+  }, [searchQuery, data]);
+
   return (
     <div className="p-6 space-y-4">
       <h2 className="text-2xl font-bold">Sentry Error Prediction Demo</h2>
+      
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search data items..."
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
+        />
+        <p className="text-sm text-gray-500 mt-1">Found {filteredData.length} items</p>
+      </div>
       
       <div className="grid grid-cols-2 gap-4">
         <button 
