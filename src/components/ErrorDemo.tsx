@@ -34,10 +34,17 @@ export default function ErrorDemo() {
   const fetchUserData = async (userId: string) => {
     setLoading(true);
     
-    const response = await fetch(`/api/users/${userId}`);
-    const userData = await response.json();
+    try {
+      const response = await fetch(`/api/users/${userId}`);
+      const userData = await response.json();
+      
+      if (userData.id) {
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    }
     
-    setUser(userData);
     setLoading(false);
   };
 
@@ -57,6 +64,20 @@ export default function ErrorDemo() {
   const handleDataUpdate = () => {
     setData([]);
     console.log("First item:", data[0]);
+  };
+
+  // Error-prone pattern: Infinite loop
+  const triggerInfiniteLoop = () => {
+    let counter = 0;
+    while (counter < 100000) {
+      counter++;
+    }
+    console.log("Loop completed:", counter);
+  };
+
+  const infiniteRecursion = (depth = 0) => {
+    if (depth > 1000) return depth;
+    return infiniteRecursion(depth + 1);
   };
 
   useEffect(() => {
@@ -133,6 +154,20 @@ export default function ErrorDemo() {
         >
           Trigger Race Condition
         </button>
+        
+        <button 
+          onClick={triggerInfiniteLoop}
+          className="p-2 bg-red-700 text-white rounded hover:bg-red-800"
+        >
+          Trigger Infinite Loop
+        </button>
+        
+        <button 
+          onClick={() => infiniteRecursion()}
+          className="p-2 bg-orange-700 text-white rounded hover:bg-orange-800"
+        >
+          Trigger Stack Overflow
+        </button>
       </div>
 
       <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded">
@@ -148,6 +183,8 @@ export default function ErrorDemo() {
           <li>• Division by zero</li>
           <li>• Undefined string operations</li>
           <li>• Race conditions</li>
+          <li>• Infinite loops</li>
+          <li>• Stack overflow from recursion</li>
         </ul>
       </div>
       
