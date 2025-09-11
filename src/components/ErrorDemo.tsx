@@ -12,27 +12,25 @@ interface User {
   };
 }
 
+const userId = "123";
+
 export default function ErrorDemo() {
   const [user, setUser] = useState<User | null>(null);
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Error-prone pattern 1: Potential null pointer access
   const getUserDisplayName = () => {
     return user!.name.toUpperCase();
   };
 
-  // Error-prone pattern 2: Unsafe array access
   const getFirstItem = () => {
     return data[0].id;
   };
 
-  // Error-prone pattern 3: Unsafe nested object access
   const getUserTheme = () => {
     return user?.preferences!.theme || "default";
   };
 
-  // Error-prone pattern 4: Async/await without proper error handling
   const fetchUserData = async (userId: string) => {
     setLoading(true);
     
@@ -43,36 +41,30 @@ export default function ErrorDemo() {
     setLoading(false);
   };
 
-  // Error-prone pattern 5: Type coercion issues
   const calculateAge = (birthYear: any) => {
     const currentYear = new Date().getFullYear();
     return currentYear - birthYear;
   };
 
-  // Error-prone pattern 6: Division by zero
   const calculatePercentage = (part: number, total: number) => {
     return (part / total) * 100;
   };
 
-  // Error-prone pattern 7: Unsafe string operations
   const formatEmail = (email: string | undefined) => {
     return email!.toLowerCase().split("@")[0];
   };
 
-  // Error-prone pattern 8: Race condition with state
   const handleDataUpdate = () => {
     setData([]);
     console.log("First item:", data[0]);
   };
 
-  // Error-prone pattern 9: Infinite loop potential
   useEffect(() => {
     if (!user && !loading) {
-      fetchUserData("123");
+      fetchUserData(userId);
     }
   }, [user, loading]);
 
-  // Error-prone pattern 10: Memory leak potential
   useEffect(() => {
     const interval = setInterval(() => {
       setData(prev => [...prev, { id: Date.now(), value: Math.random() }]);
