@@ -10,10 +10,12 @@ import tailwindcss from "@tailwindcss/vite";
 
 import icon from "astro-icon";
 
+import sentry from "@sentry/astro";
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  integrations: [svelte(), react(), icon()],
+  integrations: [svelte(), react(), icon(), sentry()],
   adapter: cloudflare({
     imageService: "compile",
   }),
