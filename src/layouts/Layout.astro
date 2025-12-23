@@ -6,21 +6,30 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const theme = Astro.cookies.get('theme')?.value || 'light';
+const themePreference = Astro.cookies.get('theme')?.value || 'system';
 
 import "../styles/global.css";
 
 ---
 
 <!doctype html>
-<html lang="en" class={theme}>
+<html lang="en" data-theme-preference={themePreference}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
+    <meta name="description" content="Sergiy Dybskiy - Developer Experience Engineer at Sentry. Building great developer tools and experiences." />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline>
+      (function() {
+        const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
+        const theme = pref === 'system' 
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : pref;
+        document.documentElement.className = theme;
+      })();
+    </script>
     <script
       id="counterscale-script"
       data-site-id="serg_tech"
@@ -46,13 +55,6 @@ import "../styles/global.css";
     --foreground: #ffffff;
     --primary: #e5e5e5;
     --muted: #666666;
-  }
-
-  :root[class~="sentry"] {
-    --background: #2b1b3d;
-    --foreground: #f7f5fb;
-    --primary: #ff6154;
-    --muted: #9b89a8;
   }
 
   html {

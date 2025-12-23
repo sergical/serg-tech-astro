@@ -4,7 +4,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const { theme } = await request.json();
 
   // Validate theme
-  if (theme !== "light" && theme !== "dark" && theme !== "sentry") {
+  if (theme !== "light" && theme !== "dark" && theme !== "system") {
     return new Response("Invalid theme", { status: 400 });
   }
 

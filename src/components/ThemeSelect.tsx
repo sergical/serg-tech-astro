@@ -1,90 +1,81 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { MoonIcon, SunIcon, MonitorIcon } from "lucide-react";
 
-import SentryIcon from "@/icons/SentryIcon";
-import { MoonIcon, SunIcon } from "lucide-react";
+type ThemeMode = "light" | "dark" | "system";
 
 interface ThemeSelectProps {
   initialTheme?: string;
 }
 
-export default function ThemeSelect({
-  initialTheme = "light",
-}: ThemeSelectProps) {
-  const themes = useMemo(
-    () => [
-      {
-        value: "light",
-        label: "Light",
-        icon: <SunIcon className="h-4 w-4" />,
-      },
-      {
-        value: "dark",
-        label: "Dark",
-        icon: <MoonIcon className="h-4 w-4" />,
-      },
-      {
-        value: "sentry",
-        label: "Sentry",
-        icon: <SentryIcon className="h-4 w-4" />,
-      },
-    ],
-    []
+export default function ThemeSelect({ initialTheme }: ThemeSelectProps) {
+  const [mode, setMode] = useState<ThemeMode>(
+    (initialTheme as ThemeMode) || "system"
   );
 
-  const [theme, setTheme] = useState<string>(initialTheme);
+  const getSystemTheme = () =>
+    window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
-  const handleThemeChange = async (newTheme: string) => {
-    try {
-      // Update server-side cookie
-      const response = await fetch("/api/theme", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ theme: newTheme }),
-      });
+  const applyTheme = (themeMode: ThemeMode) => {
+    const resolvedTheme = themeMode === "system" ? getSystemTheme() : themeMode;
+    document.documentElement.className = resolvedTheme;
+  };
 
-      if (response.ok) {
-        // Update local state
-        setTheme(newTheme);
+  useEffect(() => {
+    // Apply theme on mount
+    applyTheme(mode);
 
-        // Update document class
-        document.documentElement.className = newTheme;
+    // Listen for system preference changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      if (mode === "system") {
+        applyTheme("system");
       }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [mode]);
+
+  const handleThemeChange = async (newMode: ThemeMode) => {
+    setMode(newMode);
+    applyTheme(newMode);
+
+    try {
+      await fetch("/api/theme", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ theme: newMode }),
+      });
     } catch (error) {
-      console.error("Failed to update theme:", error);
+      console.error("Failed to save theme preference:", error);
     }
   };
 
+  const themes: { value: ThemeMode; icon: React.ReactNode; label: string }[] = [
+    { value: "light", icon: <SunIcon className="h-4 w-4" />, label: "Light" },
+    { value: "dark", icon: <MoonIcon className="h-4 w-4" />, label: "Dark" },
+    { value: "system", icon: <MonitorIcon className="h-4 w-4" />, label: "System" },
+  ];
+
   return (
-    <Select value={theme} onValueChange={handleThemeChange}>
-      <SelectTrigger className="w-[130px] h-8">
-        <SelectValue placeholder="Select theme">
-          <div className="flex items-center gap-2">
-            <span>{themes.find((t) => t.value === theme)?.icon}</span>
-            <span>{themes.find((t) => t.value === theme)?.label}</span>
-          </div>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {themes.map((themeOption) => (
-          <SelectItem key={themeOption.value} value={themeOption.value}>
-            <div className="flex items-center gap-2">
-              <span>{themeOption.icon}</span>
-              <span>{themeOption.label}</span>
-            </div>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-1">
+      {themes.map((theme) => (
+        <button
+          key={theme.value}
+          onClick={() => handleThemeChange(theme.value)}
+          className={`p-1.5 rounded transition-colors ${
+            mode === theme.value
+              ? "text-foreground bg-foreground/10"
+              : "text-foreground/40 hover:text-foreground"
+          }`}
+          aria-label={theme.label}
+          title={theme.label}
+        >
+          {theme.icon}
+        </button>
+      ))}
+    </div>
   );
 }
