@@ -14,7 +14,7 @@ import "../styles/global.css";
 ---
 
 <!doctype html>
-<html lang="en" data-theme-preference={themePreference}>
+<html lang="en" data-theme-preference={themePreference} transition:persist="html">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Sergiy Dybskiy - Developer Experience Engineer at Sentry. Building great developer tools and experiences." />
@@ -24,13 +24,29 @@ import "../styles/global.css";
     <title>{title}</title>
     <ClientRouter />
     <script is:inline>
+      // Get theme from localStorage (most reliable for client-side persistence)
       (function() {
-        const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
+        const storedTheme = localStorage.getItem('theme');
+        const pref = storedTheme || document.documentElement.getAttribute('data-theme-preference') || 'system';
         const theme = pref === 'system' 
           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : pref;
         document.documentElement.className = theme;
+        // Ensure localStorage is in sync
+        if (!storedTheme) {
+          localStorage.setItem('theme', pref);
+        }
       })();
+    </script>
+    <script is:inline>
+      // Re-apply theme after view transitions to prevent flash
+      document.addEventListener('astro:after-swap', () => {
+        const storedTheme = localStorage.getItem('theme') || 'system';
+        const theme = storedTheme === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : storedTheme;
+        document.documentElement.className = theme;
+      });
     </script>
     <script
       id="counterscale-script"
