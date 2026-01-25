@@ -13,7 +13,7 @@ const currentPath = Astro.url.pathname;
 
 <header class="mb-8" transition:persist="header" transition:name="header-area">
   <div class="flex items-center justify-between mb-1">
-    <h1><TypewriterName client:load texts={texts} /></h1>
+    <h1><TypewriterName client:load texts={texts ?? ['sergiy dybskiy', 'serge']} /></h1>
     <nav class="flex gap-4">
       <a 
         href="/" 
