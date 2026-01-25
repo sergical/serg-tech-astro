@@ -1,5 +1,5 @@
 <script>
-  import { onMount, afterUpdate } from 'svelte';
+  import { onMount } from 'svelte';
 
   // Props - optional texts array
   export let texts = ['sergiy dybskiy', 'serge'];
@@ -10,7 +10,7 @@
   let isTyping = true;
   let shouldBlink = false;
   let timeoutId;
-  let prevTexts = texts;
+  let initialized = false;
 
   // Configuration
   const TYPING_SPEED = 100;
@@ -20,21 +20,6 @@
   
   // Determine if we should loop (multiple texts) or stop after first (single text)
   $: shouldLoop = texts.length > 1;
-
-  // Reset animation when texts prop changes
-  afterUpdate(() => {
-    if (JSON.stringify(texts) !== JSON.stringify(prevTexts)) {
-      prevTexts = texts;
-      // Reset state
-      if (timeoutId) clearTimeout(timeoutId);
-      displayText = '';
-      currentTextIndex = 0;
-      isTyping = true;
-      shouldBlink = false;
-      // Restart animation
-      typeText();
-    }
-  });
 
   const typeText = () => {
     const currentText = texts[currentTextIndex];
@@ -76,15 +61,29 @@
     }
   };
 
-  onMount(() => {
-    // Start the animation
+  const startAnimation = () => {
+    if (timeoutId) clearTimeout(timeoutId);
+    displayText = '';
+    currentTextIndex = 0;
+    isTyping = true;
+    shouldBlink = false;
     typeText();
+  };
+
+  onMount(() => {
+    initialized = true;
+    startAnimation();
 
     // Cleanup function
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
   });
+
+  // Restart animation when texts prop changes (after initial mount)
+  $: if (initialized && texts) {
+    startAnimation();
+  }
 </script>
 
 <span class="font-bold flex items-center min-h-[1.5em] max-w-full">
