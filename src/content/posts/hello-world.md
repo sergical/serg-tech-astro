@@ -6,8 +6,6 @@ draft: false
 tags: ["astro", "blogging"]
 ---
 
-# Hello World
-
 Welcome to my blog! This is my first post using Astro Content Collections.
 
 ## What is Astro?

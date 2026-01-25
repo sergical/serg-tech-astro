@@ -11,7 +11,7 @@ const { location, texts, showLocation = true } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="mb-8" transition:persist="header">
+<header class="mb-8">
   <div class="flex items-center justify-between mb-1">
     <h1><TypewriterName client:load texts={texts ?? ['sergiy dybskiy', 'serge']} /></h1>
     <nav class="flex gap-4">
