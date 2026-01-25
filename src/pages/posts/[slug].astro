@@ -3,7 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
   return posts.map((post: CollectionEntry<'posts'>) => ({
     params: { slug: post.slug },
     props: { post },
@@ -78,15 +78,13 @@ const { Content } = await post.render();
     margin-bottom: 0.5em;
   }
   .prose code {
-    background: var(--muted);
-    opacity: 0.2;
+    background-color: rgba(128, 128, 128, 0.2);
     padding: 0.2em 0.4em;
     border-radius: 0.25em;
     font-size: 0.875em;
   }
   .prose pre {
-    background: var(--muted);
-    opacity: 0.1;
+    background-color: rgba(128, 128, 128, 0.1);
     padding: 1em;
     border-radius: 0.5em;
     overflow-x: auto;
