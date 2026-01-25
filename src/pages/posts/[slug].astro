@@ -24,9 +24,9 @@ const { Content } = await post.render();
 
 <Layout title={post.data.title}>
   <div class="min-h-screen font-mono p-4 flex flex-col text-sm">
-    <main class="max-w-[700px] w-full mx-auto">
+    <main class="max-w-[700px] w-full mx-auto flex-grow flex flex-col">
       <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
-      <article>
+      <article class="flex-grow">
         <header class="mb-8">
           <h1 class="text-3xl font-bold" transition:name={`post-title-${post.slug}`}>{post.data.title}</h1>
           <time class="text-sm text-[var(--muted)] block mt-2" transition:name={`post-date-${post.slug}`}>

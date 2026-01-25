@@ -10,13 +10,13 @@ const sortedPosts = posts.sort((a: CollectionEntry<'posts'>, b: CollectionEntry<
 
 <Layout title="Posts">
   <div class="min-h-screen font-mono p-4 flex flex-col text-sm">
-    <main class="max-w-[700px] w-full mx-auto">
+    <main class="max-w-[700px] w-full mx-auto flex-grow flex flex-col">
       <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
       
       {sortedPosts.length === 0 ? (
-        <p class="text-[var(--muted)]">No posts yet.</p>
+        <p class="text-[var(--muted)] flex-grow">No posts yet.</p>
       ) : (
-        <ul class="space-y-8">
+        <ul class="space-y-8 flex-grow">
           {sortedPosts.map((post: CollectionEntry<'posts'>) => (
             <li>
               <a href={`/posts/${post.slug}`} class="block group">
