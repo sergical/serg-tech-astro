@@ -124,4 +124,15 @@ import "../styles/global.css";
   ::view-transition-new(header-area) {
     animation: 150ms ease-in 100ms fade-in;
   }
+
+  /* Post title morph - smooth size/position transition without crossfade */
+  ::view-transition-image-pair(post-title-hello-world) {
+    isolation: auto;
+  }
+  
+  ::view-transition-old(post-title-hello-world),
+  ::view-transition-new(post-title-hello-world) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
 </style>
