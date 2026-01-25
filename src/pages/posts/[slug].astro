@@ -23,7 +23,7 @@ const { Content } = await post.render();
 
 <Layout title={post.data.title}>
   <div class="min-h-screen font-mono p-4 flex flex-col text-sm">
-    <main class="max-w-[700px] w-full mx-auto" transition:name="main-content">
+    <main class="max-w-[700px] w-full mx-auto">
       <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
       <article>
         <header class="mb-8">
@@ -35,9 +35,9 @@ const { Content } = await post.render();
               day: 'numeric'
             })}
           </time>
-          <p class="text-[var(--muted)] mt-2">{post.data.description}</p>
+          <p class="text-[var(--muted)] mt-2" transition:name={`post-desc-${post.slug}`}>{post.data.description}</p>
           {post.data.tags.length > 0 && (
-            <div class="flex gap-2 mt-4">
+            <div class="flex gap-2 mt-4" transition:name={`post-tags-${post.slug}`}>
               {post.data.tags.map((tag: string) => (
                 <span class="text-xs px-2 py-1 bg-[var(--muted)]/10 rounded">
                   {tag}

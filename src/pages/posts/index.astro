@@ -9,7 +9,7 @@ const sortedPosts = posts.sort((a: CollectionEntry<'posts'>, b: CollectionEntry<
 
 <Layout title="Posts">
   <div class="min-h-screen font-mono p-4 flex flex-col text-sm">
-    <main class="max-w-[700px] w-full mx-auto" transition:name="main-content">
+    <main class="max-w-[700px] w-full mx-auto">
       <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
       
       {sortedPosts.length === 0 ? (
@@ -29,11 +29,11 @@ const sortedPosts = posts.sort((a: CollectionEntry<'posts'>, b: CollectionEntry<
                 <h2 class="text-xl font-semibold mt-1 group-hover:underline" transition:name={`post-title-${post.slug}`}>
                   {post.data.title}
                 </h2>
-                <p class="text-[var(--muted)] mt-2">
+                <p class="text-[var(--muted)] mt-2" transition:name={`post-desc-${post.slug}`}>
                   {post.data.description}
                 </p>
                 {post.data.tags.length > 0 && (
-                  <div class="flex gap-2 mt-3">
+                  <div class="flex gap-2 mt-3" transition:name={`post-tags-${post.slug}`}>
                     {post.data.tags.map((tag: string) => (
                       <span class="text-xs px-2 py-1 bg-[var(--muted)]/10 rounded">
                         {tag}

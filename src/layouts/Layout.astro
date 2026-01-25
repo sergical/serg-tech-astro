@@ -24,7 +24,6 @@ import "../styles/global.css";
     <title>{title}</title>
     <ClientRouter />
     <script is:inline>
-      // Apply theme from cookie-set data-theme-preference attribute
       (function() {
         const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
         const theme = pref === 'system' 
@@ -34,7 +33,6 @@ import "../styles/global.css";
       })();
     </script>
     <script is:inline>
-      // Re-apply theme after view transitions (html element persists via transition:persist)
       document.addEventListener('astro:after-swap', () => {
         const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
         const theme = pref === 'system'
@@ -77,10 +75,9 @@ import "../styles/global.css";
   body {
     background: var(--background);
     color: var(--foreground);
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Subtle view transition animations */
+  /* Minimal view transitions - fast fade, let browser handle named element morphing */
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -91,48 +88,11 @@ import "../styles/global.css";
     to { opacity: 0; }
   }
 
-  @keyframes slide-from-right {
-    from { transform: translateX(20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes slide-to-left {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(-20px); opacity: 0; }
-  }
-
   ::view-transition-old(root) {
-    animation: 200ms ease-out fade-out;
+    animation: 100ms ease-out fade-out;
   }
 
   ::view-transition-new(root) {
-    animation: 200ms ease-in fade-in;
-  }
-
-  ::view-transition-old(main-content) {
-    animation: 250ms ease-out slide-to-left;
-  }
-
-  ::view-transition-new(main-content) {
-    animation: 250ms ease-in slide-from-right;
-  }
-
-  ::view-transition-old(header-area) {
-    animation: 150ms ease-out fade-out;
-  }
-
-  ::view-transition-new(header-area) {
-    animation: 150ms ease-in 100ms fade-in;
-  }
-
-  /* Post title morph - smooth size/position transition without crossfade */
-  ::view-transition-image-pair(post-title-hello-world) {
-    isolation: auto;
-  }
-  
-  ::view-transition-old(post-title-hello-world),
-  ::view-transition-new(post-title-hello-world) {
-    animation: none;
-    mix-blend-mode: normal;
+    animation: 100ms ease-in fade-in;
   }
 </style>
