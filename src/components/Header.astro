@@ -4,9 +4,10 @@ import TypewriterName from './TypewriterName.svelte';
 interface Props {
   location: string;
   texts?: string[];
+  showLocation?: boolean;
 }
 
-const { location, texts } = Astro.props;
+const { location, texts, showLocation = true } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
@@ -34,5 +35,5 @@ const currentPath = Astro.url.pathname;
       </a>
     </nav>
   </div>
-  <p class="mb-3 text-[#666]">{location}</p>
+  {showLocation && <p class="mb-3 text-[#666]">{location}</p>}
 </header>

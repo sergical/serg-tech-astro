@@ -24,7 +24,7 @@ const { Content } = await post.render();
 <Layout title={post.data.title}>
   <div class="min-h-screen font-mono p-4 bg-[var(--background)] text-[var(--foreground)]">
     <main class="max-w-2xl mx-auto" transition:name="main-content">
-      <Header location="toronto, canada" texts={[post.data.title]} />
+      <Header location="toronto, canada" texts={[post.data.title]} showLocation={false} />
       <article class="py-8">
         <header class="mb-8">
           <time class="text-sm text-[var(--muted)]">

@@ -10,8 +10,7 @@ const sortedPosts = posts.sort((a: CollectionEntry<'posts'>, b: CollectionEntry<
 <Layout title="Posts">
   <div class="min-h-screen font-mono p-4 bg-[var(--background)] text-[var(--foreground)]">
     <main class="max-w-2xl mx-auto" transition:name="main-content">
-      <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} />
-      <h1 class="text-3xl font-bold mb-8">Posts</h1>
+      <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
       
       {sortedPosts.length === 0 ? (
         <p class="text-[var(--muted)]">No posts yet.</p>

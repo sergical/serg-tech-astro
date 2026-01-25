@@ -72,8 +72,8 @@
   });
 </script>
 
-<span class="font-bold flex items-center">
-  {displayText}<span class="inline-block ml-1" class:animate-blink={shouldBlink}>█</span>
+<span class="font-bold flex items-center min-h-[1.5em] max-w-full">
+  <span class="truncate">{displayText}</span><span class="inline-block ml-1 flex-shrink-0" class:animate-blink={shouldBlink}>█</span>
 </span>
 
 <style>
