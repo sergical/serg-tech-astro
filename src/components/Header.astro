@@ -3,15 +3,16 @@ import TypewriterName from './TypewriterName.svelte';
 
 interface Props {
   location: string;
+  texts?: string[];
 }
 
-const { location } = Astro.props;
+const { location, texts } = Astro.props;
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="mb-8">
+<header class="mb-8" transition:name="header-area">
   <div class="flex items-center justify-between mb-1">
-    <h1><TypewriterName client:load /></h1>
+    <h1><TypewriterName client:load texts={texts} /></h1>
     <nav class="flex gap-4">
       <a 
         href="/" 

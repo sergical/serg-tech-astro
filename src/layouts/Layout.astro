@@ -1,5 +1,6 @@
 ---
 import '@fontsource/geist-mono';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -21,6 +22,7 @@ import "../styles/global.css";
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter />
     <script is:inline>
       (function() {
         const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
@@ -65,5 +67,50 @@ import "../styles/global.css";
     background: var(--background);
     color: var(--foreground);
     transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Subtle view transition animations */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes slide-from-right {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes slide-to-left {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-20px); opacity: 0; }
+  }
+
+  ::view-transition-old(root) {
+    animation: 200ms ease-out fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation: 200ms ease-in fade-in;
+  }
+
+  ::view-transition-old(main-content) {
+    animation: 250ms ease-out slide-to-left;
+  }
+
+  ::view-transition-new(main-content) {
+    animation: 250ms ease-in slide-from-right;
+  }
+
+  ::view-transition-old(header-area) {
+    animation: 150ms ease-out fade-out;
+  }
+
+  ::view-transition-new(header-area) {
+    animation: 150ms ease-in 100ms fade-in;
   }
 </style>

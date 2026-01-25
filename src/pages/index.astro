@@ -50,7 +50,7 @@ const previousJobs = workExperience.filter(job => !job.isCurrent);
 
 <Layout title="Sergiy Dybskiy, Builder">
   <div class="min-h-screen font-mono p-4 flex items-center justify-center text-sm">
-    <main class="max-w-[700px] w-full">
+    <main class="max-w-[700px] w-full" transition:name="main-content">
       <Header location="toronto, canada" />
 
       {currentJob && (
