@@ -22,8 +22,8 @@ const { Content } = await post.render();
 ---
 
 <Layout title={post.data.title}>
-  <div class="min-h-screen font-mono p-4 flex items-center justify-center text-sm">
-    <main class="max-w-[700px] w-full" transition:name="main-content">
+  <div class="min-h-screen font-mono p-4 flex flex-col text-sm">
+    <main class="max-w-[700px] w-full mx-auto" transition:name="main-content">
       <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
       <article class="py-8">
         <header class="mb-8">
@@ -34,7 +34,6 @@ const { Content } = await post.render();
               day: 'numeric'
             })}
           </time>
-          <h1 class="text-3xl font-bold mt-2" transition:name={`post-title-${post.slug}`}>{post.data.title}</h1>
           <p class="text-[var(--muted)] mt-2">{post.data.description}</p>
           {post.data.tags.length > 0 && (
             <div class="flex gap-2 mt-4">
