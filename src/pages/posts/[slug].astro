@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
@@ -19,38 +20,37 @@ const { Content } = await post.render();
 ---
 
 <Layout title={post.data.title}>
-  <article class="max-w-2xl mx-auto px-4 py-16">
-    <header class="mb-8">
-      <time class="text-sm text-[var(--muted)]">
-        {post.data.date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })}
-      </time>
-      <h1 class="text-3xl font-bold mt-2">{post.data.title}</h1>
-      <p class="text-[var(--muted)] mt-2">{post.data.description}</p>
-      {post.data.tags.length > 0 && (
-        <div class="flex gap-2 mt-4">
-          {post.data.tags.map((tag: string) => (
-            <span class="text-xs px-2 py-1 bg-[var(--muted)]/10 rounded">
-              {tag}
-            </span>
-          ))}
+  <div class="min-h-screen font-mono p-4 bg-[var(--background)] text-[var(--foreground)]">
+    <main class="max-w-2xl mx-auto">
+      <Header location="toronto, canada" />
+      <article class="py-8">
+        <header class="mb-8">
+          <time class="text-sm text-[var(--muted)]">
+            {post.data.date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </time>
+          <h1 class="text-3xl font-bold mt-2">{post.data.title}</h1>
+          <p class="text-[var(--muted)] mt-2">{post.data.description}</p>
+          {post.data.tags.length > 0 && (
+            <div class="flex gap-2 mt-4">
+              {post.data.tags.map((tag: string) => (
+                <span class="text-xs px-2 py-1 bg-[var(--muted)]/10 rounded">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </header>
+
+        <div class="prose prose-neutral dark:prose-invert max-w-none">
+          <Content />
         </div>
-      )}
-    </header>
-
-    <div class="prose prose-neutral dark:prose-invert max-w-none">
-      <Content />
-    </div>
-
-    <footer class="mt-12 pt-8 border-t border-[var(--muted)]/20">
-      <a href="/posts" class="text-[var(--muted)] hover:underline">
-        ← All posts
-      </a>
-    </footer>
-  </article>
+      </article>
+    </main>
+  </div>
 </Layout>
 
 <style is:global>
