@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
 
   // Props - optional texts array
   export let texts = ['sergiy dybskiy', 'serge'];
@@ -9,6 +9,8 @@
   let currentTextIndex = 0;
   let isTyping = true;
   let shouldBlink = false;
+  let timeoutId;
+  let prevTexts = texts;
 
   // Configuration
   const TYPING_SPEED = 100;
@@ -19,49 +21,62 @@
   // Determine if we should loop (multiple texts) or stop after first (single text)
   $: shouldLoop = texts.length > 1;
 
-  onMount(() => {
-    let timeoutId;
+  // Reset animation when texts prop changes
+  afterUpdate(() => {
+    if (JSON.stringify(texts) !== JSON.stringify(prevTexts)) {
+      prevTexts = texts;
+      // Reset state
+      if (timeoutId) clearTimeout(timeoutId);
+      displayText = '';
+      currentTextIndex = 0;
+      isTyping = true;
+      shouldBlink = false;
+      // Restart animation
+      typeText();
+    }
+  });
+
+  const typeText = () => {
+    const currentText = texts[currentTextIndex];
     
-    const typeText = () => {
-      const currentText = texts[currentTextIndex];
-      
-      if (isTyping) {
-        if (displayText.length < currentText.length) {
-          displayText = currentText.slice(0, displayText.length + 1);
-          timeoutId = setTimeout(typeText, TYPING_SPEED);
-        } else {
-          // Finished typing
-          shouldBlink = true;
-          
-          // Only continue cycling if there are multiple texts
-          if (shouldLoop) {
-            timeoutId = setTimeout(() => {
-              shouldBlink = false;
-              isTyping = false;
-              clearText();
-            }, PAUSE_AFTER_TYPING);
-          }
-          // If single text, just keep blinking cursor at end
-        }
-      }
-    };
-
-    const clearText = () => {
-      if (displayText.length > 0) {
-        displayText = displayText.slice(0, -1);
-        timeoutId = setTimeout(clearText, CLEARING_SPEED);
+    if (isTyping) {
+      if (displayText.length < currentText.length) {
+        displayText = currentText.slice(0, displayText.length + 1);
+        timeoutId = setTimeout(typeText, TYPING_SPEED);
       } else {
-        // Finished clearing, move to next text
+        // Finished typing
         shouldBlink = true;
-        currentTextIndex = (currentTextIndex + 1) % texts.length;
-        timeoutId = setTimeout(() => {
-          shouldBlink = false;
-          isTyping = true;
-          typeText();
-        }, PAUSE_BEFORE_TYPING);
+        
+        // Only continue cycling if there are multiple texts
+        if (shouldLoop) {
+          timeoutId = setTimeout(() => {
+            shouldBlink = false;
+            isTyping = false;
+            clearText();
+          }, PAUSE_AFTER_TYPING);
+        }
+        // If single text, just keep blinking cursor at end
       }
-    };
+    }
+  };
 
+  const clearText = () => {
+    if (displayText.length > 0) {
+      displayText = displayText.slice(0, -1);
+      timeoutId = setTimeout(clearText, CLEARING_SPEED);
+    } else {
+      // Finished clearing, move to next text
+      shouldBlink = true;
+      currentTextIndex = (currentTextIndex + 1) % texts.length;
+      timeoutId = setTimeout(() => {
+        shouldBlink = false;
+        isTyping = true;
+        typeText();
+      }, PAUSE_BEFORE_TYPING);
+    }
+  };
+
+  onMount(() => {
     // Start the animation
     typeText();
 
@@ -85,4 +100,4 @@
   .animate-blink {
     animation: blink 1s infinite;
   }
-</style> 
+</style>
