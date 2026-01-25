@@ -23,3 +23,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .cursorrules
+
+# licensed reference docs (not for distribution)
+.reference/

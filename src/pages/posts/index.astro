@@ -1,0 +1,52 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+
+const posts = await getCollection('posts', ({ data }: CollectionEntry<'posts'>) => !data.draft);
+const sortedPosts = posts.sort((a: CollectionEntry<'posts'>, b: CollectionEntry<'posts'>) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout title="Posts">
+  <main class="max-w-2xl mx-auto px-4 py-16">
+    <h1 class="text-3xl font-bold mb-8">Posts</h1>
+    
+    {sortedPosts.length === 0 ? (
+      <p class="text-[var(--muted)]">No posts yet.</p>
+    ) : (
+      <ul class="space-y-8">
+        {sortedPosts.map((post: CollectionEntry<'posts'>) => (
+          <li>
+            <a href={`/posts/${post.slug}`} class="block group">
+              <time class="text-sm text-[var(--muted)]">
+                {post.data.date.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </time>
+              <h2 class="text-xl font-semibold mt-1 group-hover:underline">
+                {post.data.title}
+              </h2>
+              <p class="text-[var(--muted)] mt-2">
+                {post.data.description}
+              </p>
+              {post.data.tags.length > 0 && (
+                <div class="flex gap-2 mt-3">
+                  {post.data.tags.map((tag: string) => (
+                    <span class="text-xs px-2 py-1 bg-[var(--muted)]/10 rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+    
+    <a href="/" class="inline-block mt-12 text-[var(--muted)] hover:underline">
+      ← Back home
+    </a>
+  </main>
+</Layout>
