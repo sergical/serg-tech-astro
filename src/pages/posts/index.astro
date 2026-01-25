@@ -13,9 +13,9 @@ const sortedPosts = posts.sort((a: CollectionEntry<'posts'>, b: CollectionEntry<
       <Header location="toronto, canada" texts={['writing', 'posts', 'thoughts']} showLocation={false} />
       
       {sortedPosts.length === 0 ? (
-        <p class="text-[var(--muted)] pt-8">No posts yet.</p>
+        <p class="text-[var(--muted)]">No posts yet.</p>
       ) : (
-        <ul class="space-y-8 pt-8">
+        <ul class="space-y-8">
           {sortedPosts.map((post: CollectionEntry<'posts'>) => (
             <li>
               <a href={`/posts/${post.slug}`} class="block group">
