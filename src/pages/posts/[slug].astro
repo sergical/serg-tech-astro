@@ -34,6 +34,7 @@ const { Content } = await post.render();
               day: 'numeric'
             })}
           </time>
+          <h1 class="text-3xl font-bold mt-2" transition:name={`post-title-${post.slug}`}>{post.data.title}</h1>
           <p class="text-[var(--muted)] mt-2">{post.data.description}</p>
           {post.data.tags.length > 0 && (
             <div class="flex gap-2 mt-4">
