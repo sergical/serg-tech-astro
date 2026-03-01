@@ -1,5 +1,6 @@
 ---
 import '@fontsource/geist-mono';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -13,7 +14,7 @@ import "../styles/global.css";
 ---
 
 <!doctype html>
-<html lang="en" data-theme-preference={themePreference}>
+<html lang="en" data-theme-preference={themePreference} transition:persist="html" transition:persist-props>
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Sergiy Dybskiy - Developer Experience Engineer at Sentry. Building great developer tools and experiences." />
@@ -21,6 +22,7 @@ import "../styles/global.css";
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter />
     <script is:inline>
       (function() {
         const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
@@ -29,6 +31,15 @@ import "../styles/global.css";
           : pref;
         document.documentElement.className = theme;
       })();
+    </script>
+    <script is:inline>
+      document.addEventListener('astro:after-swap', () => {
+        const pref = document.documentElement.getAttribute('data-theme-preference') || 'system';
+        const theme = pref === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : pref;
+        document.documentElement.className = theme;
+      });
     </script>
     <script
       id="counterscale-script"
@@ -64,6 +75,24 @@ import "../styles/global.css";
   body {
     background: var(--background);
     color: var(--foreground);
-    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Minimal view transitions - fast fade, let browser handle named element morphing */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  ::view-transition-old(root) {
+    animation: 100ms ease-out fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation: 100ms ease-in fade-in;
   }
 </style>

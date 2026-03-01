@@ -3,14 +3,37 @@ import TypewriterName from './TypewriterName.svelte';
 
 interface Props {
   location: string;
+  texts?: string[];
+  showLocation?: boolean;
 }
 
-const { location } = Astro.props;
+const { location, texts, showLocation = true } = Astro.props;
+const currentPath = Astro.url.pathname;
 ---
 
-<header class="mb-8">
-  <div class="flex items-center mb-1">
-    <h1><TypewriterName client:load /></h1>
+<header class="mb-8" transition:animate="none">
+  <div class="flex items-center justify-between mb-1">
+    <h1><TypewriterName client:load texts={texts ?? ['sergiy dybskiy', 'serge']} /></h1>
+    <nav class="flex gap-4">
+      <a 
+        href="/" 
+        class:list={[
+          "text-sm hover:underline",
+          currentPath === "/" ? "text-[var(--foreground)]" : "text-[var(--muted)]"
+        ]}
+      >
+        Home
+      </a>
+      <a 
+        href="/posts" 
+        class:list={[
+          "text-sm hover:underline",
+          currentPath.startsWith("/posts") ? "text-[var(--foreground)]" : "text-[var(--muted)]"
+        ]}
+      >
+        Posts
+      </a>
+    </nav>
   </div>
-  <p class="mb-3 text-[#666]">{location}</p>
+  {showLocation && <p class="mb-3 text-[#666]">{location}</p>}
 </header>
