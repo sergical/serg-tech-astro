@@ -28,7 +28,7 @@ export function DiffReview({ instruction, before, after, onAccept, onDiscard }: 
   const parts = diffWords(before, after);
 
   return (
-    <div className="rounded border border-muted p-3">
+    <div>
       <p className="text-muted-foreground text-sm mb-3">&ldquo;{instruction}&rdquo;</p>
       <div className="text-base leading-relaxed whitespace-pre-wrap">
         {parts.map((part, i) =>
@@ -44,14 +44,6 @@ export function DiffReview({ instruction, before, after, onAccept, onDiscard }: 
             <span key={i}>{part.value}</span>
           ),
         )}
-      </div>
-      <div className="flex gap-3 mt-3 text-sm">
-        <button type="button" onClick={onAccept} className="text-primary hover:underline">
-          accept
-        </button>
-        <button type="button" onClick={onDiscard} className="text-muted-foreground hover:underline">
-          discard
-        </button>
       </div>
     </div>
   );

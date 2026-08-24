@@ -13,7 +13,7 @@ if (!post) {
 }
 ---
 
-<Layout title={`${post.data.title || 'untitled'} · preview`}>
+<Layout title={`${post.data.title || 'untitled'} · preview`} pwa>
   <div class="min-h-screen font-mono p-4 flex items-center justify-center text-sm">
     <main class="max-w-[700px] w-full">
       {post.data.status !== 'published' && (

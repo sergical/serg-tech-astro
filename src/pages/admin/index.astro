@@ -7,26 +7,34 @@ import { listPosts } from '../../lib/posts';
 const posts = await listPosts();
 ---
 
-<Layout title="admin · sergiy dybskiy">
-  <div class="min-h-screen font-mono p-4 flex items-center justify-center text-sm">
-    <main class="max-w-[700px] w-full">
-      <h1 class="font-semibold mb-4">admin</h1>
-
-      <form method="post" action="/admin/new" class="mb-8">
-        <button type="submit" class="text-primary hover:underline">new post</button>
+<Layout title="admin · sergiy dybskiy" pwa>
+  <main class="max-w-[760px] mx-auto px-4 py-6 font-mono text-base">
+    <div class="flex items-center gap-2 mb-6">
+      <h1 class="font-semibold">posts</h1>
+      <form method="post" action="/admin/new" class="ml-auto">
+        <button
+          type="submit"
+          class="inline-flex items-center h-11 px-5 rounded-full bg-primary text-background"
+        >
+          new post
+        </button>
       </form>
+    </div>
 
-      <ul class="space-y-2">
-        {posts.map((post) => (
-          <li class="flex items-center gap-2">
-            <span class="text-muted-foreground">[{post.status}]</span>
-            <a href={`/admin/${post.id}`} class="text-primary hover:underline">
-              {post.title || 'untitled'}
-            </a>
-            <span class="text-muted-foreground">{post.updated_at.slice(0, 10)}</span>
-          </li>
-        ))}
-      </ul>
-    </main>
-  </div>
+    <ul>
+      {posts.map((post) => (
+        <li>
+          <a
+            href={`/admin/${post.id}`}
+            class="flex flex-col gap-0.5 py-3 border-b border-muted min-h-[44px]"
+          >
+            <span class="text-foreground">{post.title || 'untitled'}</span>
+            <span class="text-muted-foreground text-sm">
+              [{post.status}] · {post.updated_at.slice(0, 10)}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
 </Layout>

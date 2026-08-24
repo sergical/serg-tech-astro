@@ -1,0 +1,10 @@
+{
+  "name": "serg.tech admin",
+  "short_name": "admin",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": []
+}

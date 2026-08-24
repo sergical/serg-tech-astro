@@ -3,9 +3,10 @@ import '@fontsource/geist-mono';
 
 interface Props {
   title: string;
+  pwa?: boolean;
 }
 
-const { title } = Astro.props;
+const { title, pwa = false } = Astro.props;
 const themePreference = Astro.cookies.get('theme')?.value || 'system';
 
 import "../styles/global.css";
@@ -17,9 +18,18 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Sergiy Dybskiy - Developer Experience Engineer at Sentry. Building great developer tools and experiences." />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#ffffff" />
+    {pwa && (
+      <>
+        <link rel="manifest" href="/admin.webmanifest" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="serg.tech admin" />
+      </>
+    )}
     <title>{title}</title>
     <script is:inline>
       (function() {

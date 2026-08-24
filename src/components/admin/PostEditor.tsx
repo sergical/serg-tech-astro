@@ -77,8 +77,11 @@ export default function PostEditor({ postId }: PostEditorProps) {
   const [tidyDictation, setTidyDictation] = useState(() => {
     return localStorage.getItem('admin.tidyDictation') !== 'false';
   });
+  const [instructOpen, setInstructOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
+  const titleRef = useRef<HTMLTextAreaElement | null>(null);
   const skipAutosave = useRef(true);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingCaret = useRef<number | null>(null);
@@ -188,6 +191,14 @@ export default function PostEditor({ postId }: PostEditorProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, description, slug, body]);
 
+  // Long titles wrap on narrow screens instead of being cut off by a single-line input.
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [title]);
+
   // --- warn on unload while unsaved ---
   useEffect(() => {
     function handler(event: BeforeUnloadEvent) {
@@ -289,6 +300,7 @@ export default function PostEditor({ postId }: PostEditorProps) {
   function handleInstructionSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     applyInstruction(instructionInput);
+    setInstructOpen(false);
   }
 
   function acceptPendingEdit() {
@@ -405,34 +417,45 @@ export default function PostEditor({ postId }: PostEditorProps) {
     return <p className="text-muted-foreground text-sm">{error ?? 'loading…'}</p>;
   }
 
+  const dictateDisabled = recording === 'instruct' || (busy !== null && recording !== 'dictate');
+
   return (
-    <div className="text-sm">
-      <div className="flex items-center gap-3 mb-4">
-        <a href="/admin" className="text-muted-foreground hover:text-foreground">
-          ← admin
+    <div className="text-base pb-40">
+      <div className="flex items-center gap-2 flex-wrap mb-4">
+        <a href="/admin" className="inline-flex items-center min-h-[44px] text-muted-foreground">
+          ← posts
         </a>
-        <span className="text-muted-foreground">[{post.status}]</span>
-        <div className="ml-auto flex items-center gap-3">
-          <span className="text-muted-foreground">{saveIndicator()}</span>
+        <span className="text-muted-foreground text-sm">[{post.status}]</span>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{saveIndicator()}</span>
           <a
             href={`/admin/preview/${post.id}`}
             target="_blank"
             rel="noreferrer"
-            className="text-primary hover:underline"
+            className="inline-flex items-center min-h-[44px] px-3 rounded-full border border-muted"
           >
             preview
           </a>
-          <button type="button" onClick={togglePublish} className="text-primary hover:underline">
+          <button
+            type="button"
+            onClick={togglePublish}
+            className="inline-flex items-center min-h-[44px] px-3 rounded-full border border-muted text-primary"
+          >
             {post.status === 'published' ? 'unpublish' : 'publish'}
           </button>
         </div>
       </div>
 
-      <input
+      <textarea
+        ref={titleRef}
         value={title}
-        onChange={(event) => setTitle(event.target.value)}
+        onChange={(event) => setTitle(event.target.value.replace(/\n/g, ' '))}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') event.preventDefault();
+        }}
         placeholder="title"
-        className="w-full bg-transparent outline-none text-2xl font-semibold mb-2 placeholder:text-muted-foreground"
+        rows={1}
+        className="w-full bg-transparent outline-none resize-none overflow-hidden text-2xl font-semibold leading-tight mb-2 placeholder:text-muted-foreground"
       />
 
       <div className="flex flex-col gap-1 mb-4 text-muted-foreground">
@@ -442,6 +465,10 @@ export default function PostEditor({ postId }: PostEditorProps) {
             value={slug}
             onChange={(event) => setSlug(event.target.value)}
             onBlur={handleSlugBlur}
+            inputMode="url"
+            autoCapitalize="none"
+            autoCorrect="off"
+            style={{ fontSize: '16px' }}
             className="bg-transparent outline-none flex-1"
           />
         </div>
@@ -450,6 +477,7 @@ export default function PostEditor({ postId }: PostEditorProps) {
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           placeholder="one-line description"
+          style={{ fontSize: '16px' }}
           className="w-full bg-transparent outline-none placeholder:text-muted-foreground"
         />
       </div>
@@ -469,8 +497,8 @@ export default function PostEditor({ postId }: PostEditorProps) {
           onChange={(event) => setBody(event.target.value)}
           placeholder="write, or hold the mic and talk."
           rows={1}
-          className="w-full resize-none overflow-hidden bg-transparent outline-none text-base leading-relaxed"
-          style={{ fontSize: '16px' }}
+          className="w-full resize-none overflow-hidden bg-transparent outline-none leading-relaxed min-h-[40vh]"
+          style={{ fontSize: '17px' }}
         />
       )}
 
@@ -486,18 +514,20 @@ export default function PostEditor({ postId }: PostEditorProps) {
       )}
 
       {historyOpen && (
-        <div className="border border-muted rounded p-3 mt-3">
+        <div className="mt-3">
           <p className="text-muted-foreground text-xs mb-2">history</p>
-          <ul className="space-y-1">
+          <ul>
             {(revisions ?? []).map((revision) => (
               <li key={revision.id}>
                 <button
                   type="button"
                   onClick={() => loadRevision(revision.id, revision.created_at)}
-                  className="text-primary hover:underline"
+                  className="w-full text-left py-3 min-h-[44px] border-b border-muted"
                 >
-                  {new Date(revision.created_at).toLocaleString()} · {revision.source} ·{' '}
-                  {revision.title || 'untitled'}
+                  <span className="block">{new Date(revision.created_at).toLocaleString()}</span>
+                  <span className="block text-muted-foreground text-sm">
+                    {revision.source} · {revision.title || 'untitled'}
+                  </span>
                 </button>
               </li>
             ))}
@@ -506,74 +536,155 @@ export default function PostEditor({ postId }: PostEditorProps) {
         </div>
       )}
 
-      <div className="sticky bottom-0 bg-background/90 backdrop-blur border-t border-muted mt-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={toggleDictate}
-          disabled={recording === 'instruct' || (busy !== null && recording !== 'dictate')}
-          className="text-primary hover:underline disabled:opacity-50"
-        >
-          {recording === 'dictate' ? (
+      <div className="fixed inset-x-0 bottom-0 z-20 bg-background/95 backdrop-blur border-t border-muted px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="max-w-[760px] mx-auto flex flex-col gap-3">
+          {pendingEdit ? (
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={acceptPendingEdit}
+                className="flex-1 h-12 rounded-full bg-primary text-background font-semibold"
+              >
+                accept
+              </button>
+              <button
+                type="button"
+                onClick={discardPendingEdit}
+                className="flex-1 h-12 rounded-full border border-muted"
+              >
+                discard
+              </button>
+            </div>
+          ) : recording !== null ? (
             <>
-              <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-1 align-middle" />
-              {formatTimer(recorder.seconds)} stop
+              <span className="text-muted-foreground text-sm">
+                {recording === 'dictate' ? 'dictating…' : 'say what should change…'}
+              </span>
+              <button
+                type="button"
+                onClick={recording === 'dictate' ? toggleDictate : toggleInstruct}
+                className="h-12 rounded-full bg-red-500 text-white font-semibold"
+              >
+                ● {formatTimer(recorder.seconds)} · stop
+              </button>
             </>
+          ) : busy ? (
+            <button
+              type="button"
+              disabled
+              className="h-12 rounded-full border border-muted text-muted-foreground"
+            >
+              {busy}…
+            </button>
           ) : (
-            '● dictate'
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={toggleInstruct}
-          disabled={recording === 'dictate' || (busy !== null && recording !== 'instruct')}
-          className="text-primary hover:underline disabled:opacity-50"
-        >
-          {recording === 'instruct' ? (
             <>
-              <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-1 align-middle" />
-              {formatTimer(recorder.seconds)} stop
+              {moreOpen && (
+                <div className="flex flex-col">
+                  {undoStack.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        undoLastEdit();
+                        setMoreOpen(false);
+                      }}
+                      className="w-full text-left min-h-[44px] py-2"
+                    >
+                      undo last ai edit
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toggleHistory();
+                      setMoreOpen(false);
+                    }}
+                    className="w-full text-left min-h-[44px] py-2"
+                  >
+                    history
+                  </button>
+                  <label className="w-full flex items-center gap-2 min-h-[44px] py-2 text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={tidyDictation}
+                      onChange={(event) => setTidyDictation(event.target.checked)}
+                      className="w-5 h-5"
+                    />
+                    tidy dictation
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDelete();
+                      setMoreOpen(false);
+                    }}
+                    className="w-full text-left min-h-[44px] py-2 text-red-500"
+                  >
+                    delete post
+                  </button>
+                </div>
+              )}
+
+              {instructOpen && (
+                <div className="flex flex-col gap-2">
+                  <form onSubmit={handleInstructionSubmit} className="flex items-center gap-2">
+                    <input
+                      autoFocus
+                      value={instructionInput}
+                      onChange={(event) => setInstructionInput(event.target.value)}
+                      placeholder="what should change?"
+                      style={{ fontSize: '16px' }}
+                      className="flex-1 h-11 px-3 rounded-full border border-muted bg-transparent outline-none"
+                    />
+                    <button type="submit" className="h-11 px-4 rounded-full bg-primary text-background">
+                      apply
+                    </button>
+                    <button
+                      type="button"
+                      onClick={toggleInstruct}
+                      aria-label="dictate instruction"
+                      className="h-11 w-11 rounded-full border border-muted"
+                    >
+                      🎙
+                    </button>
+                  </form>
+                  <button
+                    type="button"
+                    onClick={() => setInstructOpen(false)}
+                    className="min-h-[44px] text-muted-foreground text-sm self-start"
+                  >
+                    close
+                  </button>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={toggleDictate}
+                  disabled={dictateDisabled}
+                  className="flex-1 h-12 rounded-full bg-primary text-background font-semibold disabled:opacity-50"
+                >
+                  🎙 dictate
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInstructOpen((v) => !v)}
+                  className="flex-1 h-12 rounded-full border border-muted"
+                >
+                  ✦ edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMoreOpen((v) => !v)}
+                  aria-label="more"
+                  className="h-12 w-12 rounded-full border border-muted"
+                >
+                  ⋯
+                </button>
+              </div>
             </>
-          ) : (
-            '✦ edit by voice'
           )}
-        </button>
-
-        <form onSubmit={handleInstructionSubmit} className="flex items-center gap-2 flex-1 min-w-[200px]">
-          <input
-            value={instructionInput}
-            onChange={(event) => setInstructionInput(event.target.value)}
-            placeholder="or type an instruction…"
-            className="flex-1 bg-transparent outline-none border-b border-muted"
-          />
-          <button type="submit" className="text-primary hover:underline">
-            apply
-          </button>
-        </form>
-
-        {busy && <span className="text-muted-foreground text-xs">{busy}…</span>}
-
-        {undoStack.length > 0 && (
-          <button type="button" onClick={undoLastEdit} className="text-muted-foreground hover:underline">
-            undo ai
-          </button>
-        )}
-
-        <label className="flex items-center gap-1 text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={tidyDictation}
-            onChange={(event) => setTidyDictation(event.target.checked)}
-          />
-          tidy dictation
-        </label>
-
-        <button type="button" onClick={toggleHistory} className="text-muted-foreground hover:underline">
-          history
-        </button>
-        <button type="button" onClick={handleDelete} className="text-muted-foreground hover:underline">
-          delete
-        </button>
+        </div>
       </div>
     </div>
   );

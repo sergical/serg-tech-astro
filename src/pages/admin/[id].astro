@@ -13,7 +13,7 @@ if (!post) {
 }
 ---
 
-<Layout title={`editing · ${post.title || 'untitled'}`}>
+<Layout title={`editing · ${post.title || 'untitled'}`} pwa>
   <div class="min-h-screen font-mono p-4">
     <main class="max-w-[760px] mx-auto px-4">
       <PostEditor postId={post.id} client:only="react" />
