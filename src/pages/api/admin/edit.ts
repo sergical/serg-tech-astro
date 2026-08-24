@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import Anthropic from '@anthropic-ai/sdk';
 import { json, readJsonBody } from '../../../lib/api';
 
 interface EditRequestBody {
@@ -9,6 +8,8 @@ interface EditRequestBody {
   markdown: string;
   selection?: { start: number; end: number };
 }
+
+const MODEL = '@cf/openai/gpt-oss-120b';
 
 const TIDY_SYSTEM = `The input is a raw speech transcript from the author. Turn it into clean written prose in the author's own words: fix punctuation, casing, and paragraph breaks; remove filler words and false starts. Do not add, reorder, or summarize content. Keep it as markdown. Return only the text, with no preamble, no code fence, no commentary.`;
 
@@ -19,53 +20,53 @@ function stripFence(text: string): string {
   return match ? match[1] : text;
 }
 
+interface ModelOutput {
+  output_text?: string;
+  output?: Array<{ type: string; content?: Array<{ type: string; text?: string }> }>;
+}
+
+function outputText(result: ModelOutput): string {
+  if (typeof result.output_text === 'string') return result.output_text;
+  return (result.output ?? [])
+    .flatMap((item) => (item.type === 'message' ? (item.content ?? []) : []))
+    .map((part) => part.text ?? '')
+    .join('');
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const body = await readJsonBody<EditRequestBody>(request);
   if (!body || !body.markdown || (body.mode !== 'edit' && body.mode !== 'tidy')) {
     return json({ error: 'invalid request' }, 400);
   }
 
-  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
-
-  const system = body.mode === 'tidy' ? TIDY_SYSTEM : EDIT_SYSTEM;
-
-  let userMessage: string;
+  let input: string;
   let scope: 'document' | 'selection' = 'document';
   if (body.mode === 'tidy') {
-    userMessage = body.markdown;
+    input = body.markdown;
   } else if (body.selection) {
     const { start, end } = body.selection;
     const selected = body.markdown.slice(start, end);
     const marked =
       body.markdown.slice(0, start) + '<<<SELECTION>>>' + selected + '<<<END>>>' + body.markdown.slice(end);
     scope = 'selection';
-    userMessage = `Instruction: ${body.instruction ?? ''}\n\nThe full post is below for context, with the selection to edit marked between <<<SELECTION>>> and <<<END>>>. Only return the replacement text for the selection, not the full post.\n\n${marked}`;
+    input = `Instruction: ${body.instruction ?? ''}\n\nThe full post is below for context, with the selection to edit marked between <<<SELECTION>>> and <<<END>>>. Only return the replacement text for the selection, not the full post.\n\n${marked}`;
   } else {
-    userMessage = `Instruction: ${body.instruction ?? ''}\n\nMarkdown:\n\n${body.markdown}`;
+    input = `Instruction: ${body.instruction ?? ''}\n\nMarkdown:\n\n${body.markdown}`;
   }
 
-  const stream = client.messages.stream({
-    model: 'claude-opus-5',
-    max_tokens: 16000,
-    thinking: { type: 'adaptive' },
-    output_config: { effort: 'medium' },
-    system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
-    messages: [{ role: 'user', content: userMessage }],
-  });
+  // The binding's XOR'd Responses/ChatCompletions output type collapses to {}; narrow it ourselves.
+  const result = (await env.AI.run(MODEL, {
+    instructions: body.mode === 'tidy' ? TIDY_SYSTEM : EDIT_SYSTEM,
+    input,
+    max_output_tokens: 8000,
+    reasoning: { effort: 'low' },
+  })) as ModelOutput;
 
-  const message = await stream.finalMessage();
-
-  if (message.stop_reason === 'refusal') {
-    return json({ error: 'refused' }, 422);
-  }
-
-  const text = message.content
-    .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-    .map((block) => block.text)
-    .join('');
+  const text = stripFence(outputText(result));
+  if (!text) return json({ error: 'empty response from model' }, 502);
 
   if (body.mode === 'tidy') {
-    return json({ text: stripFence(text) });
+    return json({ text });
   }
-  return json({ text: stripFence(text), scope });
+  return json({ text, scope });
 };

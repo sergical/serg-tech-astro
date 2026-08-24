@@ -21,8 +21,8 @@ pnpm build && pnpm exec wrangler deploy
 
 ## Blog admin
 
-The blog is backed by D1 (posts), KV (sessions), and Workers AI (voice transcription), with
-Anthropic's API powering AI-assisted editing. Admin routes (`/admin*`, `/api/admin*`) are
+The blog is backed by D1 (posts), KV (sessions), and Workers AI (Whisper for voice
+transcription, gpt-oss-120b for AI-assisted editing). No external API keys are needed. Admin routes (`/admin*`, `/api/admin*`) are
 protected by Cloudflare Access.
 
 Everything is provisioned and its ids live in `wrangler.jsonc`: D1 `serg-tech-blog`, KV
@@ -33,7 +33,5 @@ Per-machine and per-secret steps:
 
 - Local database: `pnpm exec wrangler d1 migrations apply serg-tech-blog --local`
 - New migration: add `migrations/NNNN_name.sql`, apply with `--local`, then `--remote`
-- Anthropic key in production: `pnpm exec wrangler secret put ANTHROPIC_API_KEY`
-- Anthropic key locally: copy `.dev.vars.example` to `.dev.vars` (gitignored)
 
 In `astro dev` the Access check is bypassed; the Workers AI binding calls the remote model.
