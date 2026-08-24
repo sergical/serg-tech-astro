@@ -14,11 +14,17 @@ declare global {
 // Cached across requests within the same isolate: JWKS fetches are expensive and rarely change.
 let jwksCache: { team: string; jwks: ReturnType<typeof createRemoteJWKSet> } | null = null;
 
+// Accepts either the bare team name or the full <team>.cloudflareaccess.com host.
+function accessOrigin(teamDomain: string): string {
+  const host = teamDomain.endsWith('.cloudflareaccess.com')
+    ? teamDomain
+    : `${teamDomain}.cloudflareaccess.com`;
+  return `https://${host}`;
+}
+
 function getJwks(team: string) {
   if (jwksCache && jwksCache.team === team) return jwksCache.jwks;
-  const jwks = createRemoteJWKSet(
-    new URL(`https://${team}.cloudflareaccess.com/cdn-cgi/access/certs`),
-  );
+  const jwks = createRemoteJWKSet(new URL(`${accessOrigin(team)}/cdn-cgi/access/certs`));
   jwksCache = { team, jwks };
   return jwks;
 }
@@ -47,7 +53,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   try {
     const jwks = getJwks(team);
     const { payload } = await jwtVerify(token, jwks, {
-      issuer: `https://${team}.cloudflareaccess.com`,
+      issuer: accessOrigin(team),
       audience: aud,
     });
     locals.user = { email: String(payload.email ?? '') };
