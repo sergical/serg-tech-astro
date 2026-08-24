@@ -1,0 +1,41 @@
+---
+export const prerender = false;
+
+import { getLiveCollection } from 'astro:content';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import Layout from '../../layouts/Layout.astro';
+
+const { entries, error } = await getLiveCollection('posts');
+if (error) throw error;
+const posts = entries ?? [];
+---
+
+<Layout title="blog · sergiy dybskiy">
+  <div class="min-h-screen font-mono p-4 flex items-center justify-center text-sm">
+    <main class="max-w-[700px] w-full">
+      <Header location="toronto, canada" />
+
+      <section class="mb-8">
+        <h2 class="font-semibold mb-2">blog</h2>
+        {posts.length === 0 ? (
+          <p class="text-muted-foreground">nothing here yet.</p>
+        ) : (
+          <ul class="space-y-4">
+            {posts.map((post) => (
+              <li>
+                <div class="text-muted-foreground">{post.data.publishedAt?.slice(0, 10)}</div>
+                <a href={`/blog/${post.id}`} class="text-primary font-semibold hover:underline">
+                  {post.data.title || 'untitled'}
+                </a>
+                {post.data.description && <p class="text-muted-foreground">{post.data.description}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <Footer />
+    </main>
+  </div>
+</Layout>

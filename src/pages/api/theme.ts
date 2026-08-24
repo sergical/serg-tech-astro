@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-  const { theme } = await request.json();
+  const { theme } = (await request.json()) as { theme?: string };
 
   // Validate theme
   if (theme !== "light" && theme !== "dark" && theme !== "system") {

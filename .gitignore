@@ -25,3 +25,9 @@ pnpm-debug.log*
 .cursorrules
 # wrangler local state
 .wrangler/
+
+# generated wrangler types
+worker-configuration.d.ts
+
+# local secrets
+.dev.vars

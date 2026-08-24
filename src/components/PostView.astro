@@ -1,0 +1,15 @@
+---
+interface Props {
+  title: string;
+  date: string | null;
+  html: string;
+}
+
+const { title, date, html } = Astro.props;
+---
+
+<article>
+  <h1 class="font-semibold text-lg mb-1">{title || 'untitled'}</h1>
+  {date && <p class="text-muted-foreground mb-4">{date}</p>}
+  <div class="post-body" set:html={html} />
+</article>

@@ -1,0 +1,22 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { getPostById } from '../../lib/posts';
+import PostEditor from '../../components/admin/PostEditor';
+
+const { id } = Astro.params;
+const post = await getPostById(id!);
+
+if (!post) {
+  return new Response(null, { status: 404 });
+}
+---
+
+<Layout title={`editing · ${post.title || 'untitled'}`}>
+  <div class="min-h-screen font-mono p-4">
+    <main class="max-w-[760px] mx-auto px-4">
+      <PostEditor postId={post.id} client:only="react" />
+    </main>
+  </div>
+</Layout>

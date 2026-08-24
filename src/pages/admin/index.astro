@@ -1,0 +1,32 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { listPosts } from '../../lib/posts';
+
+const posts = await listPosts();
+---
+
+<Layout title="admin · sergiy dybskiy">
+  <div class="min-h-screen font-mono p-4 flex items-center justify-center text-sm">
+    <main class="max-w-[700px] w-full">
+      <h1 class="font-semibold mb-4">admin</h1>
+
+      <form method="post" action="/admin/new" class="mb-8">
+        <button type="submit" class="text-primary hover:underline">new post</button>
+      </form>
+
+      <ul class="space-y-2">
+        {posts.map((post) => (
+          <li class="flex items-center gap-2">
+            <span class="text-muted-foreground">[{post.status}]</span>
+            <a href={`/admin/${post.id}`} class="text-primary hover:underline">
+              {post.title || 'untitled'}
+            </a>
+            <span class="text-muted-foreground">{post.updated_at.slice(0, 10)}</span>
+          </li>
+        ))}
+      </ul>
+    </main>
+  </div>
+</Layout>
