@@ -9,7 +9,7 @@ interface EditRequestBody {
   selection?: { start: number; end: number };
 }
 
-const MODEL = '@cf/openai/gpt-oss-120b';
+const MODEL = '@cf/moonshotai/kimi-k2.6';
 
 const TIDY_SYSTEM = `The input is a raw speech transcript from the author. Turn it into clean written prose in the author's own words: fix punctuation, casing, and paragraph breaks; remove filler words and false starts. Do not add, reorder, or summarize content. Keep it as markdown. Return only the text, with no preamble, no code fence, no commentary.`;
 
@@ -21,16 +21,11 @@ function stripFence(text: string): string {
 }
 
 interface ModelOutput {
-  output_text?: string;
-  output?: Array<{ type: string; content?: Array<{ type: string; text?: string }> }>;
+  choices?: Array<{ message?: { content?: string | null } }>;
 }
 
 function outputText(result: ModelOutput): string {
-  if (typeof result.output_text === 'string') return result.output_text;
-  return (result.output ?? [])
-    .flatMap((item) => (item.type === 'message' ? (item.content ?? []) : []))
-    .map((part) => part.text ?? '')
-    .join('');
+  return result.choices?.[0]?.message?.content ?? '';
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -54,12 +49,12 @@ export const POST: APIRoute = async ({ request }) => {
     input = `Instruction: ${body.instruction ?? ''}\n\nMarkdown:\n\n${body.markdown}`;
   }
 
-  // The binding's XOR'd Responses/ChatCompletions output type collapses to {}; narrow it ourselves.
   const result = (await env.AI.run(MODEL, {
-    instructions: body.mode === 'tidy' ? TIDY_SYSTEM : EDIT_SYSTEM,
-    input,
-    max_output_tokens: 8000,
-    reasoning: { effort: 'low' },
+    messages: [
+      { role: 'system', content: body.mode === 'tidy' ? TIDY_SYSTEM : EDIT_SYSTEM },
+      { role: 'user', content: input },
+    ],
+    max_tokens: 8000,
   })) as ModelOutput;
 
   const text = stripFence(outputText(result));

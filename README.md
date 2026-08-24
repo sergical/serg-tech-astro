@@ -22,7 +22,7 @@ pnpm build && pnpm exec wrangler deploy
 ## Blog admin
 
 The blog is backed by D1 (posts), KV (sessions), and Workers AI (Whisper for voice
-transcription, gpt-oss-120b for AI-assisted editing). No external API keys are needed. Admin routes (`/admin*`, `/api/admin*`) are
+transcription, Kimi K2.6 for AI-assisted editing). No external API keys are needed. Admin routes (`/admin*`, `/api/admin*`) are
 protected by Cloudflare Access.
 
 Everything is provisioned and its ids live in `wrangler.jsonc`: D1 `serg-tech-blog`, KV
