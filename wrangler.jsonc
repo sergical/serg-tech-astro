@@ -3,25 +3,29 @@
   "name": "serg-tech",
   "compatibility_date": "2026-04-15",
   "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    { "pattern": "serg.tech", "custom_domain": true },
+    { "pattern": "www.serg.tech", "custom_domain": true }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "serg-tech-blog",
-      "database_id": "REPLACE_WITH_D1_ID",
+      "database_id": "620fb1c8-af0d-4bd6-91e0-d7e488cc833d",
       "migrations_dir": "migrations"
     }
   ],
   "kv_namespaces": [
     {
       "binding": "SESSION",
-      "id": "REPLACE_WITH_KV_ID"
+      "id": "341b1db5c5ec48099a04cdf7f2e73225"
     }
   ],
   "ai": {
     "binding": "AI"
   },
   "vars": {
-    "CF_ACCESS_TEAM_DOMAIN": "",
-    "CF_ACCESS_AUD": ""
+    "CF_ACCESS_TEAM_DOMAIN": "sergtech.cloudflareaccess.com",
+    "CF_ACCESS_AUD": "20e9d757b54e07f45dbe30200cb471eea24fce5b1806679a03927248ed6c1468"
   }
 }
